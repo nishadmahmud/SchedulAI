@@ -4,26 +4,36 @@ import type { Event, EventCategory } from "./types/Event";
 import EventList from "./components/EventList";
 import EventForm from "./components/EventForm";
 import EventDetailsModal from "./components/EventDetailsModal";
+import CategoryFilter from "./components/CategoryFilter";
+import dayjs from "dayjs";
+
+const API_URL = import.meta.env.VITE_SERVER_URL;
 
 function App() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<EventCategory | "All">("All");
 
   // Fetch events from backend
   useEffect(() => {
     const fetchEvents = async () => {
       setLoading(true);
       try {
-        const res = await fetch("http://localhost:5000/events");
+        const res = await fetch(`${API_URL}/events`);
         const data: Event[] = await res.json();
-        setEvents(
-          data.map((event) => ({
+        const sorted = data
+          .map((event) => ({
             ...event,
             id: (event as any)._id || event.id,
-            category: ((event as any).category as EventCategory) || "Other",
+            category: (event as any).category as EventCategory || "Other",
           }))
-        );
+          .sort((a, b) => {
+            const aDate = dayjs(`${a.date} ${a.time}`);
+            const bDate = dayjs(`${b.date} ${b.time}`);
+            return aDate.isBefore(bDate) ? -1 : aDate.isAfter(bDate) ? 1 : 0;
+          });
+        setEvents(sorted);
       } finally {
         setLoading(false);
       }
@@ -36,7 +46,7 @@ function App() {
     const event = events.find((e) => e.id === id);
     if (!event) return;
     try {
-      await fetch(`http://localhost:5000/events/${id}`, {
+      await fetch(`${API_URL}/events/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...event, archived: true }),
@@ -50,7 +60,7 @@ function App() {
   // Delete event
   const handleDelete = async (id: string) => {
     try {
-      await fetch(`http://localhost:5000/events/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/events/${id}`, { method: "DELETE" });
       setEvents((prev) => prev.filter((e) => e.id !== id));
     } catch {}
   };
@@ -67,7 +77,7 @@ function App() {
       archived: false,
     };
     try {
-      const res = await fetch("http://localhost:5000/events", {
+      const res = await fetch(`${API_URL}/events`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newEvent),
@@ -83,12 +93,20 @@ function App() {
     } catch {}
   };
 
+  // Filter events by selected category
+  const filteredEvents =
+    selectedCategory === "All"
+      ? events
+      : selectedCategory === "Archived"
+      ? events.filter((e) => e.archived)
+      : events.filter((e) => e.category === selectedCategory && !e.archived);
+
   return (
     <div
       className="min-h-screen bg-black flex flex-col items-center py-8 px-2 relative overflow-hidden"
       style={{
         backgroundImage:
-          "linear-gradient(rgba(209,213,219,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(209,213,219,0.08) 1px, transparent 1px)",
+          "linear-gradient(rgba(209,213,219,0.09) 1px, transparent 1px), linear-gradient(90deg, rgba(209,213,219,0.09) 1px, transparent 1px)",
         backgroundSize: "32px 32px",
       }}
     >
@@ -101,16 +119,12 @@ function App() {
         </p>
       </header>
 
-      <main className="w-full max-w-3xl flex flex-col gap-6">
-        {/* Event Form */}
+      <main className="w-full max-w-4xl flex flex-col gap-6">
+        {/* Add Event and Category Filter Row */}
         <section className="mb-2">
-          <EventForm onAdd={handleAddEvent} />
-        </section>
-
-        {/* Category Filter */}
-        <section className="mb-2">
-          <div className="flex justify-end">
-            <div className="text-white">[CategoryFilter goes here]</div>
+          <div className="flex flex-nowrap items-center justify-between gap-2 min-w-0">
+            <EventForm onAdd={handleAddEvent} />
+            <CategoryFilter selected={selectedCategory} onChange={setSelectedCategory} />
           </div>
         </section>
 
@@ -120,7 +134,7 @@ function App() {
             <div className="text-gray-400 text-center py-8">Loading events...</div>
           ) : (
             <EventList
-              events={events}
+              events={filteredEvents}
               onArchive={handleArchive}
               onDelete={handleDelete}
               onCardClick={(event) => {

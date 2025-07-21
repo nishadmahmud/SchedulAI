@@ -8,7 +8,12 @@ import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 
 interface EventFormProps {
-  onAdd: (data: { title: string; date: string; time: string; notes?: string }) => void;
+  onAdd: (data: {
+    title: string;
+    date: string;
+    time: string;
+    notes?: string;
+  }) => void;
 }
 
 const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
@@ -21,13 +26,25 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
   const [showTimeClock, setShowTimeClock] = useState(false);
   const [showDateCalendar, setShowDateCalendar] = useState(false);
   const [tempTime, setTempTime] = useState<Dayjs | null>(null);
-  const [ampm, setAmPm] = useState<'AM' | 'PM'>('AM');
+  const [ampm, setAmPm] = useState<"AM" | "PM">("AM");
 
   // AI-like categorization logic (same as backend)
   function getCategory(title: string, notes: string = ""): string {
     const workKeywords = ["meeting", "project", "client", "deadline", "review"];
-    const personalKeywords = ["birthday", "family", "party", "anniversary", "friend"];
-    const healthKeywords = ["doctor", "appointment", "checkup", "medicine", "hospital"];
+    const personalKeywords = [
+      "birthday",
+      "family",
+      "party",
+      "anniversary",
+      "friend",
+    ];
+    const healthKeywords = [
+      "doctor",
+      "appointment",
+      "checkup",
+      "medicine",
+      "hospital",
+    ];
     const travelKeywords = ["flight", "hotel", "trip", "travel", "journey"];
     const financeKeywords = ["invoice", "payment", "salary", "bill", "finance"];
     const text = `${title} ${notes}`.toLowerCase();
@@ -69,12 +86,12 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
     setOpen(false);
     setShowTimeClock(false);
     setShowDateCalendar(false);
-    setAmPm('AM');
+    setAmPm("AM");
   };
 
   const handleOpenTimeClock = () => {
     setTempTime(time || dayjs().hour(12).minute(0));
-    setAmPm((time || dayjs()).format('A') as 'AM' | 'PM');
+    setAmPm((time || dayjs()).format("A") as "AM" | "PM");
     setShowTimeClock(true);
   };
 
@@ -82,8 +99,8 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
     let selected = tempTime;
     if (selected) {
       let hour = selected.hour();
-      if (ampm === 'AM' && hour >= 12) hour -= 12;
-      if (ampm === 'PM' && hour < 12) hour += 12;
+      if (ampm === "AM" && hour >= 12) hour -= 12;
+      if (ampm === "PM" && hour < 12) hour += 12;
       selected = selected.hour(hour);
     }
     setTime(selected);
@@ -133,19 +150,21 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
               />
               {/* Live category badge */}
               <div className="mb-2">
-                <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
-                  liveCategory === "Work"
-                    ? "bg-blue-700 text-blue-100"
-                    : liveCategory === "Personal"
-                    ? "bg-pink-700 text-pink-100"
-                    : liveCategory === "Health"
-                    ? "bg-green-700 text-green-100"
-                    : liveCategory === "Travel"
-                    ? "bg-amber-600 text-amber-100"
-                    : liveCategory === "Finance"
-                    ? "bg-purple-700 text-purple-100"
-                    : "bg-gray-700 text-gray-200"
-                }`}>
+                <span
+                  className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
+                    liveCategory === "Work"
+                      ? "bg-blue-700 text-blue-100"
+                      : liveCategory === "Personal"
+                      ? "bg-pink-700 text-pink-100"
+                      : liveCategory === "Health"
+                      ? "bg-green-700 text-green-100"
+                      : liveCategory === "Travel"
+                      ? "bg-amber-600 text-amber-100"
+                      : liveCategory === "Finance"
+                      ? "bg-purple-700 text-purple-100"
+                      : "bg-gray-700 text-gray-200"
+                  }`}
+                >
                   {liveCategory}
                 </span>
               </div>
@@ -174,7 +193,10 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
                 </div>
                 {showDateCalendar && (
                   <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    <div className="bg-gray-900 rounded-2xl shadow-2xl p-8 border border-gray-700 flex flex-col items-center" style={{ width: 420, maxWidth: '98vw' }}>
+                    <div
+                      className="bg-gray-900 rounded-2xl shadow-2xl p-8 border border-gray-700 flex flex-col items-center"
+                      style={{ width: 420, maxWidth: "98vw" }}
+                    >
                       <DateCalendar
                         value={date}
                         onChange={handleDateChange}
@@ -182,21 +204,21 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
                           color: "#fff",
                           background: "#1f2937",
                           borderRadius: 2,
-                          '.MuiPickersDay-root': {
-                            color: '#fff',
+                          ".MuiPickersDay-root": {
+                            color: "#fff",
                           },
-                          '.MuiPickersDay-root.Mui-selected': {
-                            backgroundColor: '#06b6d4',
-                            color: '#fff',
+                          ".MuiPickersDay-root.Mui-selected": {
+                            backgroundColor: "#06b6d4",
+                            color: "#fff",
                           },
-                          '.MuiPickersDay-root:not(.Mui-selected):hover': {
-                            backgroundColor: '#334155',
+                          ".MuiPickersDay-root:not(.Mui-selected):hover": {
+                            backgroundColor: "#334155",
                           },
-                          '.MuiPickersCalendarHeader-label': {
-                            color: '#fff',
+                          ".MuiPickersCalendarHeader-label": {
+                            color: "#fff",
                           },
-                          '.MuiPickersArrowSwitcher-button': {
-                            color: '#fff',
+                          ".MuiPickersArrowSwitcher-button": {
+                            color: "#fff",
                           },
                         }}
                       />
@@ -212,19 +234,30 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
                 )}
                 {showTimeClock && (
                   <div className="fixed inset-0 z-50 flex items-center justify-center">
-                    <div className="bg-gray-900 rounded-2xl shadow-2xl p-8 border border-gray-700 flex flex-col items-center" style={{ width: 340, maxWidth: '90vw' }}>
+                    <div
+                      className="bg-gray-900 rounded-2xl shadow-2xl p-8 border border-gray-700 flex flex-col items-center"
+                      style={{ width: 340, maxWidth: "90vw" }}
+                    >
                       <div className="flex items-center justify-center gap-4 mb-4">
                         <button
                           type="button"
-                          className={`px-4 py-1 rounded font-semibold text-sm transition border ${ampm === 'AM' ? 'bg-cyan-600 text-white border-cyan-400' : 'bg-gray-800 text-gray-300 border-gray-600'}`}
-                          onClick={() => setAmPm('AM')}
+                          className={`px-4 py-1 rounded font-semibold text-sm transition border ${
+                            ampm === "AM"
+                              ? "bg-cyan-600 text-white border-cyan-400"
+                              : "bg-gray-800 text-gray-300 border-gray-600"
+                          }`}
+                          onClick={() => setAmPm("AM")}
                         >
                           AM
                         </button>
                         <button
                           type="button"
-                          className={`px-4 py-1 rounded font-semibold text-sm transition border ${ampm === 'PM' ? 'bg-cyan-600 text-white border-cyan-400' : 'bg-gray-800 text-gray-300 border-gray-600'}`}
-                          onClick={() => setAmPm('PM')}
+                          className={`px-4 py-1 rounded font-semibold text-sm transition border ${
+                            ampm === "PM"
+                              ? "bg-cyan-600 text-white border-cyan-400"
+                              : "bg-gray-800 text-gray-300 border-gray-600"
+                          }`}
+                          onClick={() => setAmPm("PM")}
                         >
                           PM
                         </button>
@@ -238,18 +271,18 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
                           color: "#fff",
                           background: "#1f2937",
                           borderRadius: 2,
-                          '.MuiClockNumber-root': {
-                            color: '#fff',
+                          ".MuiClockNumber-root": {
+                            color: "#fff",
                           },
-                          '.MuiClockNumber-root.Mui-selected': {
-                            backgroundColor: '#06b6d4',
-                            color: '#fff',
+                          ".MuiClockNumber-root.Mui-selected": {
+                            backgroundColor: "#06b6d4",
+                            color: "#fff",
                           },
-                          '.MuiClockNumber-root:not(.Mui-selected):hover': {
-                            backgroundColor: '#334155',
+                          ".MuiClockNumber-root:not(.Mui-selected):hover": {
+                            backgroundColor: "#334155",
                           },
-                          '.MuiClock-amButton, .MuiClock-pmButton': {
-                            color: '#fff',
+                          ".MuiClock-amButton, .MuiClock-pmButton": {
+                            color: "#fff",
                           },
                         }}
                       />
