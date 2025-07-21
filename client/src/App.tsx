@@ -1,66 +1,79 @@
 import "./App.css";
-import React, { useState } from "react";
-import type { Event } from "./types/Event";
+import React, { useState, useEffect } from "react";
+import type { Event, EventCategory } from "./types/Event";
 import EventList from "./components/EventList";
 import EventForm from "./components/EventForm";
 
-const mockEvents: Event[] = [
-  {
-    id: "1",
-    title: "Team Meeting",
-    date: "2024-06-10",
-    time: "10:00",
-    notes: "Discuss project milestones.",
-    category: "Work",
-    archived: false,
-  },
-  {
-    id: "2",
-    title: "Doctor Appointment",
-    date: "2024-06-12",
-    time: "15:30",
-    notes: "Annual checkup.",
-    category: "Health",
-    archived: false,
-  },
-  {
-    id: "3",
-    title: "Family Dinner",
-    date: "2024-06-11",
-    time: "19:00",
-    notes: "At grandma's house.",
-    category: "Personal",
-    archived: false,
-  },
-];
-
 function App() {
-  const [events, setEvents] = useState<Event[]>(mockEvents);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleArchive = (id: string) => {
-    setEvents((prev) =>
-      prev.map((event) =>
-        event.id === id ? { ...event, archived: true } : event
-      )
-    );
+  // Fetch events from backend
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("http://localhost:5000/events");
+        const data: Event[] = await res.json();
+        setEvents(
+          data.map((event) => ({
+            ...event,
+            id: (event as any)._id || event.id,
+            category: (event as any).category as EventCategory || "Other",
+          }))
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
+
+  // Archive event
+  const handleArchive = async (id: string) => {
+    const event = events.find((e) => e.id === id);
+    if (!event) return;
+    try {
+      await fetch(`http://localhost:5000/events/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...event, archived: true }),
+      });
+      setEvents((prev) =>
+        prev.map((e) => (e.id === id ? { ...e, archived: true } : e))
+      );
+    } catch {}
   };
 
-  const handleDelete = (id: string) => {
-    setEvents((prev) => prev.filter((event) => event.id !== id));
+  // Delete event
+  const handleDelete = async (id: string) => {
+    try {
+      await fetch(`http://localhost:5000/events/${id}`, { method: "DELETE" });
+      setEvents((prev) => prev.filter((e) => e.id !== id));
+    } catch {}
   };
 
-  // For now, assign 'Other' as default category and false for archived
-  const handleAddEvent = (data: { title: string; date: string; time: string; notes?: string }) => {
-    const newEvent: Event = {
-      id: Date.now().toString(),
-      title: data.title,
-      date: data.date,
-      time: data.time,
-      notes: data.notes,
-      category: "Other",
+  // Add event
+  const handleAddEvent = async (data: { title: string; date: string; time: string; notes?: string }) => {
+    const newEvent: Omit<Event, "id" | "category"> = {
+      ...data,
       archived: false,
     };
-    setEvents((prev) => [newEvent, ...prev]);
+    try {
+      const res = await fetch("http://localhost:5000/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newEvent),
+      });
+      const insertedEvent = await res.json();
+      setEvents((prev) => [
+        {
+          ...insertedEvent,
+          id: insertedEvent._id || insertedEvent.id || Date.now().toString(),
+        } as Event,
+        ...prev,
+      ]);
+    } catch {}
   };
 
   return (
@@ -68,7 +81,7 @@ function App() {
       className="min-h-screen bg-black flex flex-col items-center py-8 px-2 relative overflow-hidden"
       style={{
         backgroundImage:
-          "linear-gradient(rgba(209,213,219,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(209,213,219,0.08) 1px, transparent 1px)",
+          "linear-gradient(rgba(209,213,219,0.09) 1px, transparent 1px), linear-gradient(90deg, rgba(209,213,219,0.09) 1px, transparent 1px)",
         backgroundSize: "32px 32px",
       }}
     >
@@ -96,7 +109,11 @@ function App() {
 
         {/* Event List */}
         <section className="grid gap-4">
-          <EventList events={events} onArchive={handleArchive} onDelete={handleDelete} />
+          {loading ? (
+            <div className="text-gray-400 text-center py-8">Loading events...</div>
+          ) : (
+            <EventList events={events} onArchive={handleArchive} onDelete={handleDelete} />
+          )}
         </section>
       </main>
     </div>

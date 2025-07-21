@@ -31,6 +31,12 @@ const EventCard: React.FC<EventCardProps> = ({
               ? "bg-blue-700 text-blue-100"
               : event.category === "Personal"
               ? "bg-pink-700 text-pink-100"
+              : event.category === "Health"
+              ? "bg-green-700 text-green-100"
+              : event.category === "Travel"
+              ? "bg-amber-600 text-amber-100"
+              : event.category === "Finance"
+              ? "bg-purple-700 text-purple-100"
               : "bg-gray-700 text-gray-200"
           }`}
         >

@@ -23,6 +23,24 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
   const [tempTime, setTempTime] = useState<Dayjs | null>(null);
   const [ampm, setAmPm] = useState<'AM' | 'PM'>('AM');
 
+  // AI-like categorization logic (same as backend)
+  function getCategory(title: string, notes: string = ""): string {
+    const workKeywords = ["meeting", "project", "client", "deadline", "review"];
+    const personalKeywords = ["birthday", "family", "party", "anniversary", "friend"];
+    const healthKeywords = ["doctor", "appointment", "checkup", "medicine", "hospital"];
+    const travelKeywords = ["flight", "hotel", "trip", "travel", "journey"];
+    const financeKeywords = ["invoice", "payment", "salary", "bill", "finance"];
+    const text = `${title} ${notes}`.toLowerCase();
+    if (workKeywords.some((kw) => text.includes(kw))) return "Work";
+    if (personalKeywords.some((kw) => text.includes(kw))) return "Personal";
+    if (healthKeywords.some((kw) => text.includes(kw))) return "Health";
+    if (travelKeywords.some((kw) => text.includes(kw))) return "Travel";
+    if (financeKeywords.some((kw) => text.includes(kw))) return "Finance";
+    return "Other";
+  }
+
+  const liveCategory = getCategory(title, notes);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
@@ -113,6 +131,24 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
+              {/* Live category badge */}
+              <div className="mb-2">
+                <span className={`inline-block px-3 py-1 rounded text-xs font-semibold ${
+                  liveCategory === "Work"
+                    ? "bg-blue-700 text-blue-100"
+                    : liveCategory === "Personal"
+                    ? "bg-pink-700 text-pink-100"
+                    : liveCategory === "Health"
+                    ? "bg-green-700 text-green-100"
+                    : liveCategory === "Travel"
+                    ? "bg-amber-600 text-amber-100"
+                    : liveCategory === "Finance"
+                    ? "bg-purple-700 text-purple-100"
+                    : "bg-gray-700 text-gray-200"
+                }`}>
+                  {liveCategory}
+                </span>
+              </div>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <div className="flex gap-3">
                   <div className="flex-1 relative">
