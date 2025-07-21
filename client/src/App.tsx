@@ -1,7 +1,8 @@
 import "./App.css";
-import { useState } from "react";
+import React, { useState } from "react";
 import type { Event } from "./types/Event";
 import EventList from "./components/EventList";
+import EventForm from "./components/EventForm";
 
 const mockEvents: Event[] = [
   {
@@ -48,6 +49,20 @@ function App() {
     setEvents((prev) => prev.filter((event) => event.id !== id));
   };
 
+  // For now, assign 'Other' as default category and false for archived
+  const handleAddEvent = (data: { title: string; date: string; time: string; notes?: string }) => {
+    const newEvent: Event = {
+      id: Date.now().toString(),
+      title: data.title,
+      date: data.date,
+      time: data.time,
+      notes: data.notes,
+      category: "Other",
+      archived: false,
+    };
+    setEvents((prev) => [newEvent, ...prev]);
+  };
+
   return (
     <div
       className="min-h-screen bg-black flex flex-col items-center py-8 px-2 relative overflow-hidden"
@@ -69,7 +84,7 @@ function App() {
       <main className="w-full max-w-3xl flex flex-col gap-6">
         {/* Event Form */}
         <section className="mb-2">
-          <div className="text-white">[EventForm goes here]</div>
+          <EventForm onAdd={handleAddEvent} />
         </section>
 
         {/* Category Filter */}

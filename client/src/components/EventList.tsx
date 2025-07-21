@@ -8,9 +8,15 @@ interface EventListProps {
   onDelete: (id: string) => void;
 }
 
-const EventList: React.FC<EventListProps> = ({ events, onArchive, onDelete }) => {
+const EventList: React.FC<EventListProps> = ({
+  events,
+  onArchive,
+  onDelete,
+}) => {
   if (events.length === 0) {
-    return <div className="text-gray-400 text-center py-8">No events found.</div>;
+    return (
+      <div className="text-gray-400 text-center py-8">No events found.</div>
+    );
   }
   return (
     <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
@@ -26,4 +32,4 @@ const EventList: React.FC<EventListProps> = ({ events, onArchive, onDelete }) =>
   );
 };
 
-export default EventList; 
+export default EventList;
