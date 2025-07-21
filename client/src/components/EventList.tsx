@@ -6,12 +6,14 @@ interface EventListProps {
   events: Event[];
   onArchive: (id: string) => void;
   onDelete: (id: string) => void;
+  onCardClick?: (event: Event) => void;
 }
 
 const EventList: React.FC<EventListProps> = ({
   events,
   onArchive,
   onDelete,
+  onCardClick,
 }) => {
   if (events.length === 0) {
     return (
@@ -26,6 +28,7 @@ const EventList: React.FC<EventListProps> = ({
           event={event}
           onArchive={onArchive}
           onDelete={onDelete}
+          onCardClick={onCardClick}
         />
       ))}
     </div>

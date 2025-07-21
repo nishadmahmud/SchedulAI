@@ -3,10 +3,12 @@ import { useState, useEffect } from "react";
 import type { Event, EventCategory } from "./types/Event";
 import EventList from "./components/EventList";
 import EventForm from "./components/EventForm";
+import EventDetailsModal from "./components/EventDetailsModal";
 
 function App() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   // Fetch events from backend
   useEffect(() => {
@@ -86,7 +88,7 @@ function App() {
       className="min-h-screen bg-black flex flex-col items-center py-8 px-2 relative overflow-hidden"
       style={{
         backgroundImage:
-          "linear-gradient(rgba(209,213,219,0.09) 1px, transparent 1px), linear-gradient(90deg, rgba(209,213,219,0.09) 1px, transparent 1px)",
+          "linear-gradient(rgba(209,213,219,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(209,213,219,0.08) 1px, transparent 1px)",
         backgroundSize: "32px 32px",
       }}
     >
@@ -115,18 +117,22 @@ function App() {
         {/* Event List */}
         <section className="grid gap-4">
           {loading ? (
-            <div className="text-gray-400 text-center py-8">
-              Loading events...
-            </div>
+            <div className="text-gray-400 text-center py-8">Loading events...</div>
           ) : (
             <EventList
               events={events}
               onArchive={handleArchive}
               onDelete={handleDelete}
+              onCardClick={(event) => {
+                if (!event.archived) setSelectedEvent(event);
+              }}
             />
           )}
         </section>
       </main>
+      {selectedEvent && (
+        <EventDetailsModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      )}
     </div>
   );
 }
