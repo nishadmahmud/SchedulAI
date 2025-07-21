@@ -22,7 +22,7 @@ SchedulAI is a modern, minimal event scheduler web app with AI-powered event cat
 ### 1. Clone the repository
 ```bash
 # Clone the repo
- git clone <your-repo-url>
+ git clone https://github.com/nishadmahmud/SchedulAI
  cd Event_manage
 ```
 
