@@ -85,13 +85,20 @@ function App() {
         body: JSON.stringify(newEvent),
       });
       const insertedEvent = await res.json();
-      setEvents((prev) => [
-        {
-          ...insertedEvent,
-          id: insertedEvent._id || insertedEvent.id || Date.now().toString(),
-        } as Event,
-        ...prev,
-      ]);
+      setEvents((prev) => {
+        const updated = [
+          {
+            ...insertedEvent,
+            id: insertedEvent._id || insertedEvent.id || Date.now().toString(),
+          } as Event,
+          ...prev,
+        ];
+        return updated.sort((a, b) => {
+          const aDate = dayjs(`${a.date} ${a.time}`);
+          const bDate = dayjs(`${b.date} ${b.time}`);
+          return aDate.isBefore(bDate) ? -1 : aDate.isAfter(bDate) ? 1 : 0;
+        });
+      });
       toast.success("Event added");
     } catch {
       toast.error("Failed to add event");
