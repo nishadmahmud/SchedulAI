@@ -30,13 +30,23 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
 
   // AI-like categorization logic (same as backend)
   function getCategory(title: string, notes: string = ""): string {
-    const workKeywords = ["meeting", "project", "client", "deadline", "review"];
+    const workKeywords = [
+      "meeting",
+      "project",
+      "client",
+      "deadline",
+      "review",
+      "work",
+      "office",
+      "home",
+    ];
     const personalKeywords = [
       "birthday",
       "family",
       "party",
       "anniversary",
       "friend",
+      "home",
     ];
     const healthKeywords = [
       "doctor",
@@ -44,9 +54,15 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
       "checkup",
       "medicine",
       "hospital",
+      "gym",
+      "fitness",
+      "exercise",
+      "yoga",
+      "meditation",
+      "wellness",
     ];
-    const travelKeywords = ["flight", "hotel", "trip", "travel", "journey"];
-    const financeKeywords = ["invoice", "payment", "salary", "bill", "finance"];
+    const travelKeywords = ["flight", "hotel", "trip", "travel", "journey", "vacation", "holiday", "tour", "explore"];
+    const financeKeywords = ["invoice", "payment", "salary", "bill", "finance", "money", "bank", "account"];
     const text = `${title} ${notes}`.toLowerCase();
     if (workKeywords.some((kw) => text.includes(kw))) return "Work";
     if (personalKeywords.some((kw) => text.includes(kw))) return "Personal";
@@ -127,8 +143,8 @@ const EventForm: React.FC<EventFormProps> = ({ onAdd }) => {
         Add Event
       </button>
       {open && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center backdrop-blur-sm bg-black/20">
-          <div className="bg-gray-900 rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-fadeIn border border-gray-700">
+        <div className="fixed inset-0 z-40 flex items-center justify-center backdrop-blur-sm bg-black/20" onClick={() => setOpen(false)}>
+          <div className="bg-gray-900 rounded-2xl shadow-2xl p-8 w-full max-w-md relative animate-fadeIn border border-gray-700" onClick={e => e.stopPropagation()}>
             <button
               type="button"
               className="absolute top-4 right-4 text-white hover:text-cyan-200 text-2xl focus:outline-none"

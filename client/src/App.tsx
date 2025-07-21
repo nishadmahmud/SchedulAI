@@ -6,6 +6,7 @@ import EventForm from "./components/EventForm";
 import EventDetailsModal from "./components/EventDetailsModal";
 import CategoryFilter from "./components/CategoryFilter";
 import dayjs from "dayjs";
+import toast from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_SERVER_URL;
 
@@ -54,7 +55,10 @@ function App() {
       setEvents((prev) =>
         prev.map((e) => (e.id === id ? { ...e, archived: true } : e))
       );
-    } catch {}
+      toast.success("Event archived");
+    } catch {
+      toast.error("Failed to archive event");
+    }
   };
 
   // Delete event
@@ -62,16 +66,14 @@ function App() {
     try {
       await fetch(`${API_URL}/events/${id}`, { method: "DELETE" });
       setEvents((prev) => prev.filter((e) => e.id !== id));
-    } catch {}
+      toast.success("Event deleted");
+    } catch {
+      toast.error("Failed to delete event");
+    }
   };
 
   // Add event
-  const handleAddEvent = async (data: {
-    title: string;
-    date: string;
-    time: string;
-    notes?: string;
-  }) => {
+  const handleAddEvent = async (data: { title: string; date: string; time: string; notes?: string }) => {
     const newEvent: Omit<Event, "id" | "category"> = {
       ...data,
       archived: false,
@@ -90,7 +92,10 @@ function App() {
         } as Event,
         ...prev,
       ]);
-    } catch {}
+      toast.success("Event added");
+    } catch {
+      toast.error("Failed to add event");
+    }
   };
 
   // Filter events by selected category
