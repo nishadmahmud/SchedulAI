@@ -51,7 +51,8 @@ async function run() {
 
     app.put("/events/:id", async (req, res) => {
       const id = req.params.id;
-      const event = req.body;
+      const event = { ...req.body };
+      delete event._id;
       const result = await eventsCollection.updateOne(
         { _id: new ObjectId(id) },
         { $set: event }

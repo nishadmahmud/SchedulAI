@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import type { Event, EventCategory } from "./types/Event";
 import EventList from "./components/EventList";
 import EventForm from "./components/EventForm";
@@ -19,7 +19,7 @@ function App() {
           data.map((event) => ({
             ...event,
             id: (event as any)._id || event.id,
-            category: (event as any).category as EventCategory || "Other",
+            category: ((event as any).category as EventCategory) || "Other",
           }))
         );
       } finally {
@@ -54,7 +54,12 @@ function App() {
   };
 
   // Add event
-  const handleAddEvent = async (data: { title: string; date: string; time: string; notes?: string }) => {
+  const handleAddEvent = async (data: {
+    title: string;
+    date: string;
+    time: string;
+    notes?: string;
+  }) => {
     const newEvent: Omit<Event, "id" | "category"> = {
       ...data,
       archived: false,
@@ -110,9 +115,15 @@ function App() {
         {/* Event List */}
         <section className="grid gap-4">
           {loading ? (
-            <div className="text-gray-400 text-center py-8">Loading events...</div>
+            <div className="text-gray-400 text-center py-8">
+              Loading events...
+            </div>
           ) : (
-            <EventList events={events} onArchive={handleArchive} onDelete={handleDelete} />
+            <EventList
+              events={events}
+              onArchive={handleArchive}
+              onDelete={handleDelete}
+            />
           )}
         </section>
       </main>

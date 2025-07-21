@@ -18,11 +18,6 @@ const EventCard: React.FC<EventCardProps> = ({
         event.archived ? "opacity-60 border-gray-600" : "border-gray-700"
       } transition-all`}
     >
-      {event.archived && (
-        <span className="absolute top-2 right-2 bg-gray-600 text-white text-xs px-2 py-1 rounded z-10">
-          Archived
-        </span>
-      )}
       <div className="flex items-center justify-between mb-2">
         <h2
           className="text-xl font-semibold text-white truncate"
